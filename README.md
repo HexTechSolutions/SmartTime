@@ -1,3 +1,5 @@
+**Project SmartTime**
+
 1. Commiting Changes
 
 * When commiting your own changes, do not commit directly to the master branch.
