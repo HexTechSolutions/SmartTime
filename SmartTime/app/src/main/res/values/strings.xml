@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">SmartTime</string>
+    <string name="add_new_event">Add New Event</string>
+    <string name="view_events">View Events</string>
     <string name="activity_prompt">Choose an Activity</string>
     <string-array name="to_do_dropdown">
         <item>Study</item>
