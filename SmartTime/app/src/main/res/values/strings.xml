@@ -2,14 +2,4 @@
     <string name="app_name">SmartTime</string>
     <string name="add_new_event">Add New Event</string>
     <string name="view_events">View Events</string>
-    <string-array name="to_do_list">
-        <item>Buy a shampoo</item>
-        <item>Refill gas</item>
-        <item>Pay water bill</item>
-    </string-array>
-    <string-array name="to_do_list_description">
-        <item>Buy sunsilk 180ml bottle</item>
-        <item>Litro 14.5kg cylinder</item>
-        <item>Pay Rs.1000</item>
-    </string-array>
 </resources>

@@ -9,7 +9,8 @@ import android.os.Bundle;
 public class ToDoListActivity extends AppCompatActivity {
 
     RecyclerView recyclerView;
-    String listArray[], descriptionArray[];
+    String listArray[];
+    String descriptionArray[];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,8 +19,9 @@ public class ToDoListActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recyclerView);
 
-        listArray = getResources().getStringArray(R.array.to_do_list);
-        descriptionArray = getResources().getStringArray(R.array.to_do_list_description);
+        listArray = new String[]{"first item", "second item", "third item"};
+        descriptionArray = new String[]{"first desc", "second desc", "third desc"};
+
 
         ToDoListViewAdapter toDoListViewAdapter = new ToDoListViewAdapter(this, listArray, descriptionArray);
         recyclerView.setAdapter(toDoListViewAdapter);
