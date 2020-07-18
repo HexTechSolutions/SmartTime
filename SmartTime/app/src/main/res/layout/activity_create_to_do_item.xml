@@ -84,7 +84,9 @@
             android:id="@+id/spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp" />
+            android:layout_marginEnd="20dp"
+            android:entries="@array/to_do_dropdown"
+            android:prompt="@string/activity_prompt"/>
     </LinearLayout>
 
     <LinearLayout
