@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -11,21 +12,32 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import com.hextech.smarttime.util.DBHelper;
+import com.hextech.smarttime.util.ToDoItem;
+
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 public class CreateToDoItem extends AppCompatActivity {
 
     private Spinner spinner1;
     private Button btnSave, btnCancel;
-    private EditText editDate;
+    private EditText editDate, titleEditText, descriptionEditText;
     final Calendar myCalendar = Calendar.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_to_do_item);
+
+        titleEditText = findViewById(R.id.titleEditText);
+        descriptionEditText = findViewById(R.id.descriptionEditText);
 
         //Button Action Listners
         addListenerOnButton();
@@ -52,10 +64,30 @@ public class CreateToDoItem extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Toast.makeText(CreateToDoItem.this,
-                        "OnClickListener : " +
-                                "\nSpinner 1 : "+ String.valueOf(spinner1.getSelectedItem()),
-                        Toast.LENGTH_SHORT).show();
+                String title = titleEditText.getText().toString();
+                String description = descriptionEditText.getText().toString();
+                String category = spinner1.getSelectedItem().toString();
+
+                String dueDateString = editDate.getText().toString();
+                DateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
+                Date dueDate = null;
+                try {
+                    dueDate = format.parse(dueDateString);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                Date createdDate = (new Date());
+
+                ToDoItem toDoItem = new ToDoItem(title, description, category, createdDate, dueDate);
+
+                boolean status = DBHelper.insertToDoListEntry(getApplicationContext(), toDoItem);
+
+                if (status) {
+                    Toast.makeText(CreateToDoItem.this, "Data Insertion Successful!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(CreateToDoItem.this, "Data Insertion Failed!", Toast.LENGTH_SHORT).show();
+                }
             }
 
         });
