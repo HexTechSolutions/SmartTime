@@ -24,7 +24,6 @@ public class Utilities {
 
     public static String convertDateToString(Date date) {
         DateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.ENGLISH);
-        String x = format.format(date);
         return format.format(date);
     }
 
