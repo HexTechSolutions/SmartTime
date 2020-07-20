@@ -9,18 +9,26 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button viewListButton;
+    private Button viewListButton, addToDoItemButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         viewListButton = findViewById(R.id.viewEvents);
+        addToDoItemButton = findViewById(R.id.addEvent);
+
         viewListButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                  openViewTodoList();
+            }
+        });
+
+        addToDoItemButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, CreateToDoItem.class));
             }
         });
     }
