@@ -3,6 +3,8 @@
     <string name="add_new_event">Add New Event</string>
     <string name="view_events">View Events</string>
     <string name="activity_prompt">Choose an Activity</string>
+    <string name="channel_description">notification channel</string>
+    <string name="channel_name">notification</string>
     <string-array name="to_do_dropdown">
         <item>Study</item>
         <item>Buy an Item</item>
