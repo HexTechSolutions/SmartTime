@@ -80,4 +80,15 @@ public class DBHelper extends SQLiteOpenHelper {
         RECORD_ID, TITLE, DESCRIPTION, CATEGORY, CREATION_DATE, DUE_DATE
     }
 
+    public Cursor readAllData(){
+        String SQL_RETRIEVE_ENTRIES = "SELECT * FROM " + TABLE_NAME;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = null;
+        if(db != null){
+            cursor =  db.rawQuery(SQL_RETRIEVE_ENTRIES, null);
+        }
+        return cursor;
+    }
+
 }
