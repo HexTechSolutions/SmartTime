@@ -14,11 +14,13 @@ public class ToDoListViewAdapter extends RecyclerView.Adapter<ToDoListViewAdapte
     String dataArray1[];
     String dataArray2[];
     Context context;
+    private OnTodoListner onTodoListner;
 
-    public ToDoListViewAdapter(Context ct, String listArray[], String descriptionArray[]){
+    public ToDoListViewAdapter(Context ct, String listArray[], String descriptionArray[], OnTodoListner onTodoListner){
         context = ct;
         dataArray1 = listArray;
         dataArray2 = descriptionArray;
+        this.onTodoListner = onTodoListner;
     }
 
     @NonNull
@@ -26,7 +28,7 @@ public class ToDoListViewAdapter extends RecyclerView.Adapter<ToDoListViewAdapte
     public ToDoListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.to_do_list_row, parent, false);
-        return new ToDoListViewHolder(view);
+        return new ToDoListViewHolder(view, onTodoListner);
     }
 
     @Override
@@ -41,15 +43,28 @@ public class ToDoListViewAdapter extends RecyclerView.Adapter<ToDoListViewAdapte
         return dataArray1.length;
     }
 
-    public class ToDoListViewHolder extends RecyclerView.ViewHolder {
+    public class ToDoListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView title, description;
+        OnTodoListner onTodoListner;
 
-
-        public ToDoListViewHolder(@NonNull View itemView) {
+        public ToDoListViewHolder(@NonNull View itemView, OnTodoListner onTodoListner) {
             super(itemView);
             title = itemView.findViewById(R.id.todo_title_text);
             description = itemView.findViewById(R.id.todo_desc_text);
+            this.onTodoListner = onTodoListner;
+
+            itemView.setOnClickListener(this);
         }
+
+        @Override
+        public void onClick(View view) {
+            onTodoListner.onTodoClick(getAdapterPosition());
+        }
+    }
+
+    public interface OnTodoListner{
+        void onTodoClick(int position);
+
     }
 }
