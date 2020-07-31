@@ -57,18 +57,14 @@ public class ToDoListActivity extends AppCompatActivity implements ToDoListViewA
     }
 
     void storeDataInArrays(){
-        Cursor cursor =  dataBase.readAllData();
-        if(cursor.getCount() == 0){
-            Toast.makeText(this, "No data.", Toast.LENGTH_SHORT).show();
-        }else {
-            while (cursor.moveToNext()){
-                item_id.add(cursor.getString(0));
-                item_title.add(cursor.getString(1));
-                item_description.add(cursor.getString(2));
-                item_category.add(cursor.getString(3));
-                item_creation_date.add(cursor.getString(4));
-                item_due_date.add(cursor.getString(5));
-            }
+        for(int index = 0; index < dataBase.getAllData(this).size(); index++){
+            item_id.add(String.valueOf(dataBase.getAllData(this).get(index).getRecordID()));
+            item_title.add(dataBase.getAllData(this).get(index).getTitle());
+            item_description.add(dataBase.getAllData(this).get(index).getDescription());
+            item_category.add(dataBase.getAllData(this).get(index).getCategory());
+            item_creation_date.add(String.valueOf(dataBase.getAllData(this).get(index).getCreatedDate()));
+            item_due_date.add(String.valueOf(dataBase.getAllData(this).get(index).getDueDate()));
+
         }
     }
 

@@ -30,7 +30,7 @@ public class DBHelper extends SQLiteOpenHelper {
         //TODO
     }
 
-    public static ArrayList<ToDoItem> getAllData(Context context) {
+    public ArrayList<ToDoItem> getAllData(Context context) {
         DBHelper dbHelper = new DBHelper(context);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String[] projection = {DatabaseTableColumns.RECORD_ID.toString(), DatabaseTableColumns.TITLE.toString(), DatabaseTableColumns.DESCRIPTION.toString(), DatabaseTableColumns.CATEGORY.toString(), DatabaseTableColumns.CREATION_DATE.toString(), DatabaseTableColumns.DUE_DATE.toString()};
@@ -78,17 +78,6 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public enum DatabaseTableColumns {
         RECORD_ID, TITLE, DESCRIPTION, CATEGORY, CREATION_DATE, DUE_DATE
-    }
-
-    public Cursor readAllData(){
-        String SQL_RETRIEVE_ENTRIES = "SELECT * FROM " + TABLE_NAME;
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        Cursor cursor = null;
-        if(db != null){
-            cursor =  db.rawQuery(SQL_RETRIEVE_ENTRIES, null);
-        }
-        return cursor;
     }
 
 }
