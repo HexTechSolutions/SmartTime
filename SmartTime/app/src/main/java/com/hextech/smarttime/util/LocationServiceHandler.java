@@ -1,15 +1,8 @@
 package com.hextech.smarttime.util;
 
-import android.Manifest;
-import android.app.Activity;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.util.Log;
-
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -17,22 +10,21 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 public class LocationServiceHandler {
 
     public static JSONArray locations;
+    public static ArrayList<Location> nearbyLocations;
 
-    public static void sendRequest(Context context, String url, final VolleyCallback volleyCallback) {
+    public static void sendRequest(Context context, double currentLatitude, double currentLongitude, String placeType, final VolleyCallback volleyCallback) {
+
+        String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=AIzaSyDpFXzTaxUzi0r6RJj1UzUflij-JIiQ0oY&location=" + currentLatitude + "," + currentLongitude + "&radius=5000&type=" + placeType;
 
         RequestQueue queue = Volley.newRequestQueue(context);
 
@@ -43,6 +35,8 @@ public class LocationServiceHandler {
                         try {
                             JSONObject json = new JSONObject(response);
                             locations = json.getJSONArray("results");
+
+                            populateLocationsArray();
 
                             volleyCallback.onSuccess();
                         } catch (JSONException e) {
@@ -57,6 +51,26 @@ public class LocationServiceHandler {
         });
 
         queue.add(stringRequest);
+    }
+
+    private static void populateLocationsArray() {
+        nearbyLocations = new ArrayList<>();
+        
+        for (int i = 0; i < locations.length(); i++) {
+            Location location = new Location("test");
+            try {
+                JSONObject obj = locations.getJSONObject(i).getJSONObject("geometry").getJSONObject("location");
+                double tempLatitude = obj.getDouble("lat");
+                double tempLongitude = obj.getDouble("lng");
+
+                location.setLatitude(tempLatitude);
+                location.setLongitude(tempLongitude);
+
+                nearbyLocations.add(location);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }

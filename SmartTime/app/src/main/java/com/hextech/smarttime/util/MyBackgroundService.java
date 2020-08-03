@@ -60,7 +60,6 @@ public class MyBackgroundService extends Service {
     private Location mLocation;
 
     private double currentLongitude, currentLatitude;
-    public ArrayList<Location> nearbyLocations;
 
     @Override
     public void onCreate() {
@@ -163,31 +162,14 @@ public class MyBackgroundService extends Service {
             final Thread t1 = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=AIzaSyDpFXzTaxUzi0r6RJj1UzUflij-JIiQ0oY&location=" + currentLatitude + "," + currentLongitude + "&radius=5000&type=restaurant";
-                    LocationServiceHandler.sendRequest(getApplicationContext(), url, new VolleyCallback() {
+
+                    LocationServiceHandler.sendRequest(getApplicationContext(), currentLatitude, currentLongitude, "restaurant", new VolleyCallback() {
                         @Override
                         public void onSuccess() {
                             JSONArray locationsArray = LocationServiceHandler.locations;
                             Log.i("SmartTime", "Locations Acquired.");
 
-                            nearbyLocations = new ArrayList<>();
-
-                            for (int i = 0; i < locationsArray.length(); i++) {
-                                Location location = new Location("test");
-                                try {
-                                    JSONObject obj = locationsArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location");
-                                    double tempLatitude = obj.getDouble("lat");
-                                    double tempLongitude = obj.getDouble("lng");
-
-                                    location.setLatitude(tempLatitude);
-                                    location.setLongitude(tempLongitude);
-
-                                    nearbyLocations.add(location);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-
+                            ArrayList<Location> nearbyLocations = LocationServiceHandler.nearbyLocations;
                             //TODO Continue Notification work here
                         }
                     });
