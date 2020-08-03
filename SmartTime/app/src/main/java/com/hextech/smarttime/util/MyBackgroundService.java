@@ -62,10 +62,6 @@ public class MyBackgroundService extends Service {
     private double currentLongitude, currentLatitude;
     public ArrayList<Location> nearbyLocations;
 
-    public MyBackgroundService(){
-
-    }
-
     @Override
     public void onCreate() {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
