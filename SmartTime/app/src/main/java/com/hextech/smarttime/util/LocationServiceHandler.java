@@ -22,40 +22,47 @@ public class LocationServiceHandler {
     public static JSONArray locations;
     public static ArrayList<Location> nearbyLocations;
 
-    public static void sendRequest(Context context, double currentLatitude, double currentLongitude, String placeType, final VolleyCallback volleyCallback) {
+    public static void sendRequest(final Context context, final double currentLatitude, final double currentLongitude, final String placeType, final VolleyCallback volleyCallback) {
 
-        String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=AIzaSyDpFXzTaxUzi0r6RJj1UzUflij-JIiQ0oY&location=" + currentLatitude + "," + currentLongitude + "&radius=5000&type=" + placeType;
-
-        RequestQueue queue = Volley.newRequestQueue(context);
-
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject json = new JSONObject(response);
-                            locations = json.getJSONArray("results");
-
-                            populateLocationsArray();
-
-                            volleyCallback.onSuccess();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
+        Thread thread = new Thread(new Runnable() {
             @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.i("SmartTime", "ERROR: " + error.getMessage());
+            public void run() {
+                String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=AIzaSyDpFXzTaxUzi0r6RJj1UzUflij-JIiQ0oY&location=" + currentLatitude + "," + currentLongitude + "&radius=5000&type=" + placeType;
+
+                RequestQueue queue = Volley.newRequestQueue(context);
+
+                StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                try {
+                                    JSONObject json = new JSONObject(response);
+                                    locations = json.getJSONArray("results");
+
+                                    populateLocationsArray();
+
+                                    volleyCallback.onSuccess();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.i("SmartTime", "ERROR: " + error.getMessage());
+                    }
+                });
+
+                queue.add(stringRequest);
             }
         });
 
-        queue.add(stringRequest);
+        thread.start();
     }
 
     private static void populateLocationsArray() {
         nearbyLocations = new ArrayList<>();
-        
+
         for (int i = 0; i < locations.length(); i++) {
             Location location = new Location("test");
             try {

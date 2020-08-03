@@ -159,24 +159,14 @@ public class MyBackgroundService extends Service {
 
             Log.i("SmartTime", text);
 
-            final Thread t1 = new Thread(new Runnable() {
+            LocationServiceHandler.sendRequest(getApplicationContext(), currentLatitude, currentLongitude, "restaurant", new VolleyCallback() {
                 @Override
-                public void run() {
-
-                    LocationServiceHandler.sendRequest(getApplicationContext(), currentLatitude, currentLongitude, "restaurant", new VolleyCallback() {
-                        @Override
-                        public void onSuccess() {
-                            JSONArray locationsArray = LocationServiceHandler.locations;
-                            Log.i("SmartTime", "Locations Acquired.");
-
-                            ArrayList<Location> nearbyLocations = LocationServiceHandler.nearbyLocations;
-                            //TODO Continue Notification work here
-                        }
-                    });
+                public void onSuccess() {
+                    ArrayList<Location> nearbyLocations = LocationServiceHandler.nearbyLocations;
+                    Log.i("SmartTime", "Locations Acquired.");
+                    //TODO Continue Notification work here
                 }
             });
-
-            t1.start();
         }
 
         intent.putExtra(EXTRA_STARTED_FROM_NOTIFICATION, true);
