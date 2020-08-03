@@ -34,6 +34,11 @@ import com.hextech.smarttime.MainActivity;
 import com.hextech.smarttime.R;
 
 import org.greenrobot.eventbus.EventBus;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class MyBackgroundService extends Service {
 
@@ -54,6 +59,8 @@ public class MyBackgroundService extends Service {
     private Handler mServiceHandler;
     private Location mLocation;
 
+    private double currentLongitude, currentLatitude;
+    public ArrayList<Location> nearbyLocations;
 
     public MyBackgroundService(){
 
@@ -151,8 +158,48 @@ public class MyBackgroundService extends Service {
         Intent intent = new Intent(this, MyBackgroundService.class);
         String text = Common.getLocationText(mLocation);
 
-        Log.i("SmartTime", text);
-        //TODO Continue Notification work here
+        if (mLocation.getLongitude() != currentLatitude && mLocation.getLongitude() != currentLongitude) {
+            currentLatitude = mLocation.getLatitude();
+            currentLongitude = mLocation.getLongitude();
+
+            Log.i("SmartTime", text);
+
+            final Thread t1 = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=AIzaSyDpFXzTaxUzi0r6RJj1UzUflij-JIiQ0oY&location=" + currentLatitude + "," + currentLongitude + "&radius=5000&type=restaurant";
+                    LocationServiceHandler.sendRequest(getApplicationContext(), url, new VolleyCallback() {
+                        @Override
+                        public void onSuccess() {
+                            JSONArray locationsArray = LocationServiceHandler.locations;
+                            Log.i("SmartTime", "Locations Acquired.");
+
+                            nearbyLocations = new ArrayList<>();
+
+                            for (int i = 0; i < locationsArray.length(); i++) {
+                                Location location = new Location("test");
+                                try {
+                                    JSONObject obj = locationsArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location");
+                                    double tempLatitude = obj.getDouble("lat");
+                                    double tempLongitude = obj.getDouble("lng");
+
+                                    location.setLatitude(tempLatitude);
+                                    location.setLongitude(tempLongitude);
+
+                                    nearbyLocations.add(location);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            //TODO Continue Notification work here
+                        }
+                    });
+                }
+            });
+
+            t1.start();
+        }
 
         intent.putExtra(EXTRA_STARTED_FROM_NOTIFICATION, true);
         PendingIntent servicePendingIntent = PendingIntent.getService(this,0, intent,
