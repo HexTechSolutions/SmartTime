@@ -39,7 +39,7 @@ public class ToDoListActivity extends AppCompatActivity implements ToDoListViewA
     }
 
     private void openDialog(String content) {
-        SampleDialog sampleDialog = new SampleDialog(content);
-        sampleDialog.show(getSupportFragmentManager(), "sample dialog");
+        Toast.makeText(this, content +" Clicked",
+                Toast.LENGTH_SHORT).show();
     }
 }
