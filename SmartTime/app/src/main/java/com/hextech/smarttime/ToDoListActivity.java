@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -34,12 +35,9 @@ public class ToDoListActivity extends AppCompatActivity implements ToDoListViewA
 
     @Override
     public void onTodoClick(int position) {
-        String title = dataBase.getAllData(this).get(position).getTitle();
-        openDialog(title);
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra("itemNumber", position);
+        startActivity(intent);
     }
 
-    private void openDialog(String content) {
-        Toast.makeText(this, content +" Clicked",
-                Toast.LENGTH_SHORT).show();
-    }
 }
