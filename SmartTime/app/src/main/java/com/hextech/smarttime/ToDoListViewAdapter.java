@@ -6,21 +6,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.hextech.smarttime.util.DBHelper;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class ToDoListViewAdapter extends RecyclerView.Adapter<ToDoListViewAdapter.ToDoListViewHolder> {
 
-    String dataArray1[];
-    String dataArray2[];
     Context context;
     private OnTodoListner onTodoListner;
+    DBHelper dataBase;
 
-    public ToDoListViewAdapter(Context ct, String listArray[], String descriptionArray[], OnTodoListner onTodoListner){
+    public ToDoListViewAdapter(Context ct, OnTodoListner onTodoListner, DBHelper dataBase1){
         context = ct;
-        dataArray1 = listArray;
-        dataArray2 = descriptionArray;
         this.onTodoListner = onTodoListner;
+        dataBase = dataBase1;
     }
 
     @NonNull
@@ -33,14 +33,18 @@ public class ToDoListViewAdapter extends RecyclerView.Adapter<ToDoListViewAdapte
 
     @Override
     public void onBindViewHolder(@NonNull ToDoListViewHolder holder, int position) {
-        holder.title.setText(dataArray1[position]);
-        holder.description.setText(dataArray2[position]);
+//        holder.title.setText(dataArray1[position]);
+//        holder.description.setText(dataArray2[position]);
+
+        holder.title.setText(dataBase.getAllData(context).get(position).getTitle());
+        holder.description.setText(dataBase.getAllData(context).get(position).getDescription());
 
     }
 
     @Override
     public int getItemCount() {
-        return dataArray1.length;
+//        return dataArray1.length;
+        return dataBase.getAllData(context).size();
     }
 
     public class ToDoListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
