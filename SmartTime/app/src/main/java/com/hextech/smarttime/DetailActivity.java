@@ -37,6 +37,7 @@ public class DetailActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         String category = intent.getStringExtra("category");
+        Double lat = intent.getDoubleExtra("latitude", -1);
 
         //Only Runs when navigating from Notification
         if(category != null){
