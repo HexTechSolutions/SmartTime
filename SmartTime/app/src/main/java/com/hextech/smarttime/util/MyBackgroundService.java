@@ -39,6 +39,7 @@ import com.hextech.smarttime.R;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class MyBackgroundService extends Service {
 
@@ -233,7 +234,9 @@ public class MyBackgroundService extends Service {
             SendIndividualRequests(locationServiceHandlerPark,location);
         }
 
-
+        ArrayList<ToDoItem> items = DBHelper.getAllData(getApplicationContext());
+        Collections.sort(items);
+        Log.i("SmartTime", "Sorted");
 
 //        locationServiceHandlerCoffee.sendRequest(getApplicationContext(), currentLatitude, currentLongitude, location, new VolleyCallback() {
 //            @Override
