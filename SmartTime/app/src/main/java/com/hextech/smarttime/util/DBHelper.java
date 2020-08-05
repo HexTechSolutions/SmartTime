@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -73,6 +74,15 @@ public class DBHelper extends SQLiteOpenHelper {
 
         return newRowId != -1;
 
+    }
+
+    public static void deleteRecord(Context context, int recordId) {
+        DBHelper dbHelper = new DBHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String selection = DatabaseTableColumns.RECORD_ID.toString() + " LIKE " + recordId;
+        String[] selectionArgs = null;
+        int deletedRows = db.delete(TABLE_NAME, selection, selectionArgs);
+        Log.i("SmartTime", "Record deleted!");
     }
 
     public enum DatabaseTableColumns {
