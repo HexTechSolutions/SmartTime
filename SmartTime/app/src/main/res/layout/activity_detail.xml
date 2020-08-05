@@ -115,9 +115,9 @@
             android:layout_marginTop="50px">
 
             <Button
-                android:id="@+id/navigateButton"
+                android:id="@+id/getDirectionsBtn"
                 android:layout_width="match_parent"
-                android:text="Navigate" />
+                android:text="Get Directions" />
         </TableRow>
 
     </TableLayout>

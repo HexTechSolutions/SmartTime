@@ -3,6 +3,7 @@ package com.hextech.smarttime;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 public class DetailActivity extends AppCompatActivity {
 
     TextView taskTitleTF, taskDescriptionTF, taskCategoryTF, taskDateTF;
-    Button deleteTaskBtn;
+    Button deleteTaskBtn, getDirectionsBtn;
     ToDoItem item;
 
     @Override
@@ -34,6 +35,7 @@ public class DetailActivity extends AppCompatActivity {
         taskDateTF = findViewById(R.id.taskDateTF);
 
         deleteTaskBtn = findViewById(R.id.DeleteTaskBtn);
+        getDirectionsBtn = findViewById(R.id.getDirectionsBtn);
 
         final int recordId = getIntent().getIntExtra("itemNumber", -1);
         if (recordId != -1) {
@@ -47,6 +49,28 @@ public class DetailActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        final String latitude = String.valueOf(getIntent().getDoubleExtra("latitude", -1));
+        final String longitude = String.valueOf(getIntent().getDoubleExtra("longitude", -1));
+
+        if(latitude.equals("-1.0") && longitude.equals("-1.0")){
+            getDirectionsBtn.setVisibility(View.INVISIBLE);
+        }else{
+            getDirectionsBtn.setVisibility(View.VISIBLE);
+            getDirectionsBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    openDirectionsOnGoogleMaps(latitude, longitude);
+                }
+            });
+        }
+    }
+
+    private void openDirectionsOnGoogleMaps(String latitude, String longitude) {
+        Uri gmmIntentUri = Uri.parse("google.navigation:q=" + latitude + "," + longitude);
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+        startActivity(mapIntent);
     }
 
     private void populateFields(int recordId) {
