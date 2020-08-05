@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,118 +7,130 @@
     android:orientation="horizontal"
     tools:context=".DetailActivity">
 
-    <TableLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
-        <TableRow
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="300px">
+            android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/taskTitle"
-                android:layout_height="wrap_content"
+            <TableLayout
                 android:layout_width="match_parent"
-                android:text="Title: "
-                android:layout_marginLeft="100px"
-                android:textSize="20dp"/>
+                android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/taskTitleTF"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="150px"/>
-        </TableRow>
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="300px">
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="50px">
+                    <TextView
+                        android:id="@+id/taskTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="100px"
+                        android:text="Title: "
+                        android:textSize="20dp" />
 
-            <TextView
-                android:id="@+id/taskDescription"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:text="Description: "
-                android:layout_marginLeft="100px"
-                android:textSize="20dp"/>
+                    <TextView
+                        android:id="@+id/taskTitleTF"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="150px" />
+                </TableRow>
 
-            <TextView
-                android:id="@+id/taskDescriptionTF"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="150px" />
-        </TableRow>
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="50px">
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="50px">
+                    <TextView
+                        android:id="@+id/taskDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="100px"
+                        android:text="Description: "
+                        android:textSize="20dp" />
 
-            <TextView
-                android:id="@+id/taskCategory"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:text="Category: "
-                android:layout_marginLeft="100px"
-                android:textSize="20dp"/>
+                    <TextView
+                        android:id="@+id/taskDescriptionTF"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="150px" />
+                </TableRow>
 
-            <TextView
-                android:id="@+id/taskCategoryTF"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="150px" />
-        </TableRow>
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="50px">
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="50px">
+                    <TextView
+                        android:id="@+id/taskCategory"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="100px"
+                        android:text="Category: "
+                        android:textSize="20dp" />
 
-            <TextView
-                android:id="@+id/taskDate"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:text="Date: "
-                android:layout_marginLeft="100px"
-                android:textSize="20dp"/>
+                    <TextView
+                        android:id="@+id/taskCategoryTF"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="150px" />
+                </TableRow>
 
-            <TextView
-                android:id="@+id/taskDateTF"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="150px" />
-        </TableRow>
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="50px">
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="80px">
+                    <TextView
+                        android:id="@+id/taskDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="100px"
+                        android:text="Date: "
+                        android:textSize="20dp" />
 
-            <Button
-                android:id="@+id/editTaskBtn"
-                android:layout_marginLeft="100px"
-                android:text="Edit Task"/>
+                    <TextView
+                        android:id="@+id/taskDateTF"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="150px" />
+                </TableRow>
 
-            <Button
-                android:id="@+id/DeleteTaskBtn"
-                android:layout_marginLeft="200px"
-                android:text="Delete Task"/>
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="80px">
 
-        </TableRow>
+                    <!--            <Button-->
+                    <!--                android:id="@+id/editTaskBtn"-->
+                    <!--                android:layout_marginLeft="100px"-->
+                    <!--                android:text="Edit Task"/>-->
 
-        <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginTop="50px">
+                    <Button
+                        android:id="@+id/DeleteTaskBtn"
+                        android:layout_marginLeft="200px"
+                        android:text="Delete Task" />
 
-            <Button
-                android:id="@+id/navigateButton"
-                android:layout_width="match_parent"
-                android:text="Navigate" />
-        </TableRow>
+                </TableRow>
 
-    </TableLayout>
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="50px">
+
+                    <Button
+                        android:id="@+id/navigateButton"
+                        android:layout_width="match_parent"
+                        android:text="Navigate" />
+                </TableRow>
+
+            </TableLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>
