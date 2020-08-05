@@ -34,6 +34,18 @@ public class ToDoListActivity extends AppCompatActivity implements ToDoListViewA
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        dataBase = new DBHelper(ToDoListActivity.this);
+
+        ToDoListViewAdapter toDoListViewAdapter = new ToDoListViewAdapter(this, this, dataBase);
+        recyclerView.setAdapter(toDoListViewAdapter);
+    }
+
+    @Override
     public void onTodoClick(int position) {
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra("itemNumber", position);
