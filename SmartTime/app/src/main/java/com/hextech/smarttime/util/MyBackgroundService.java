@@ -65,6 +65,12 @@ public class MyBackgroundService extends Service {
 
     public static final String NOTIFICATION_CHANNEL_ID = "10001";
     private final static String default_notification_channel_id = "default";
+    String GROUP_KEY_WORK_EMAIL = "com.android.example.WORK_EMAIL";
+
+    LocationServiceHandler locationServiceHandlerCoffee;
+    LocationServiceHandler locationServiceHandlerPark;
+    LocationServiceHandler locationServiceHandlerLibrary;
+    LocationServiceHandler locationServiceHandlerShopping;
 
     @Override
     public void onCreate() {
@@ -168,10 +174,20 @@ public class MyBackgroundService extends Service {
             //Returns all the To-Do items in the database
             ArrayList data = DBHelper.getAllData(getApplicationContext());
 
-            sendRequest("restaurant");
-            sendRequest("library");
-            sendRequest("park");
 
+
+//            for (int i = 0; i<data.size(); i++){
+//                ToDoItem td = (ToDoItem) data.get(i);
+//
+//                sendRequest(td.getCategory(),td.getRecordID());
+//
+//                System.out.println("Item ID  :" + td.getRecordID() );
+//            }
+
+            sendRequest("Coffee");
+            sendRequest("Library");
+            sendRequest("Shopping");
+            sendRequest("Park");
 
         }
 
@@ -199,14 +215,48 @@ public class MyBackgroundService extends Service {
     }
 
     private void sendRequest(final String location){
-        LocationServiceHandler.sendRequest(getApplicationContext(), currentLatitude, currentLongitude, location, new VolleyCallback() {
+
+        if(location.equals("Coffee")){
+            locationServiceHandlerCoffee = new LocationServiceHandler("Coffee");
+            SendIndividualRequests(locationServiceHandlerCoffee,location);
+        }
+        if(location.equals("Library")){
+            locationServiceHandlerLibrary = new LocationServiceHandler("Library");
+            SendIndividualRequests(locationServiceHandlerLibrary,location);
+        }
+        if(location.equals("Shopping")){
+            locationServiceHandlerShopping = new LocationServiceHandler("Shopping");
+            SendIndividualRequests(locationServiceHandlerShopping,location);
+        }
+        if(location.equals("Park")){
+            locationServiceHandlerPark = new LocationServiceHandler("Park");
+            SendIndividualRequests(locationServiceHandlerPark,location);
+        }
+
+
+
+//        locationServiceHandlerCoffee.sendRequest(getApplicationContext(), currentLatitude, currentLongitude, location, new VolleyCallback() {
+//            @Override
+//            public void onSuccess() {
+//                //ArrayList<Location> nearbyLocations = locationServiceHandler.nearbyLocations;
+//                //locations.add(nearbyLocations);
+//                Log.i("SmartTime", "Locations Acquired.");
+//
+//                CreatePushNotification(location,locations.get(0).get(0).getLongitude(),locations.get(0).get(0).getLatitude());
+//
+//            }
+//        });
+
+
+    }
+
+    private void SendIndividualRequests(final LocationServiceHandler locationServiceHandler, final String location){
+        locationServiceHandler.sendRequest(getApplicationContext(), currentLatitude, currentLongitude, location, new VolleyCallback() {
             @Override
             public void onSuccess() {
-                ArrayList<Location> nearbyLocations = LocationServiceHandler.nearbyLocations;
+                ArrayList<Location> nearbyLocations = locationServiceHandler.nearbyLocations;
                 locations.add(nearbyLocations);
                 Log.i("SmartTime", "Locations Acquired.");
-                //System.out.println("Sending Notifications " + category);
-                System.out.println("Final Locations "+locations);
 
                 CreatePushNotification(location,locations.get(0).get(0).getLongitude(),locations.get(0).get(0).getLatitude());
 
@@ -216,29 +266,57 @@ public class MyBackgroundService extends Service {
 
     private void CreatePushNotification(String title, double longitude, double latitude){
 
-        System.out.println("Lon" + longitude);
-        System.out.println("Lat" + latitude);
         //Setting DetailActivity As the Pending Intent
         Intent detailActivity = new Intent(this, DetailActivity.class);
         detailActivity.putExtra("longitude",longitude);
         detailActivity.putExtra("latitude", latitude);
+        detailActivity.putExtra("category",title);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addNextIntentWithParentStack(detailActivity);
 
         PendingIntent DetailPendingIntent = stackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
 
         //Creating Notification
+        if(title.equals("Coffee")){
+            CreateIndividualNotifications(title,000001,DetailPendingIntent);
+        }
+        if(title.equals("Shopping")){
+            CreateIndividualNotifications(title,000002,DetailPendingIntent);
+        }
+        if(title.equals("Library")){
+            CreateIndividualNotifications(title,000003,DetailPendingIntent);
+        }
+        if(title.equals("Park")){
+            CreateIndividualNotifications(title,000004,DetailPendingIntent);
+        }
+
+//        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_ID)
+//                .setSmallIcon(R.drawable.ic_launcher_background)
+//                .setContentTitle(title + " Found")
+//                .setContentText("Test Notification")
+//                .setStyle(new NotificationCompat.BigTextStyle()
+//                        .bigText("Click to see Details"))
+//                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+//                .setContentIntent(DetailPendingIntent)
+//                .setGroup(GROUP_KEY_WORK_EMAIL);
+//
+//        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
+//        notificationManager.notify(000001, builder.build());
+    }
+
+    private void CreateIndividualNotifications(String category, int nofiId, PendingIntent pendingIntent){
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_background)
-                .setContentTitle(title + " Found")
+                .setContentTitle(category + " Found")
                 .setContentText("Test Notification")
                 .setStyle(new NotificationCompat.BigTextStyle()
                         .bigText("Click to see Details"))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(DetailPendingIntent);
+                .setContentIntent(pendingIntent)
+                .setGroup(GROUP_KEY_WORK_EMAIL);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
-        notificationManager.notify(000001, builder.build());
+        notificationManager.notify(nofiId, builder.build());
     }
 
     private void createNotificationChannel() {

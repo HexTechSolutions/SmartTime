@@ -12,6 +12,14 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
+        Bundle extras = getIntent().getExtras();
+        String Lon,Lat;
+
+        if(extras != null){
+            Lon = extras.getString("longitude");
+            Lat = extras.getString("latitude");
+        }
+
         assert getSupportActionBar() != null; //null check
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); //show back button
     }

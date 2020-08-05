@@ -19,10 +19,16 @@ import java.util.ArrayList;
 
 public class LocationServiceHandler {
 
-    public static JSONArray locations;
-    public static ArrayList<Location> nearbyLocations;
+    public JSONArray locations;
+    public ArrayList<Location> nearbyLocations;
 
-    public static void sendRequest(final Context context, final double currentLatitude, final double currentLongitude, final String placeType, final VolleyCallback volleyCallback) {
+    public String categoryType;
+
+    public LocationServiceHandler(String categoryType) {
+        this.categoryType = categoryType;
+    }
+
+    public void sendRequest(final Context context, final double currentLatitude, final double currentLongitude, final String placeType, final VolleyCallback volleyCallback) {
 
         final Thread thread = new Thread(new Runnable() {
             @Override
@@ -60,7 +66,7 @@ public class LocationServiceHandler {
         thread.start();
     }
 
-    private static void populateLocationsArray() {
+    private void populateLocationsArray() {
         nearbyLocations = new ArrayList<>();
 
         for (int i = 0; i < locations.length(); i++) {
@@ -80,7 +86,7 @@ public class LocationServiceHandler {
         }
     }
 
-    public static ArrayList<Location> getNearbyLocations() {
+    public ArrayList<Location> getNearbyLocations() {
         return nearbyLocations;
     }
 }
