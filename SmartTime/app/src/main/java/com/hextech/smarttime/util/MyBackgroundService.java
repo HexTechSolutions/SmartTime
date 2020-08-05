@@ -34,9 +34,6 @@ import com.hextech.smarttime.MainActivity;
 import com.hextech.smarttime.R;
 
 import org.greenrobot.eventbus.EventBus;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -44,11 +41,11 @@ public class MyBackgroundService extends Service {
 
     private static final String CHANNEL_ID = "my_channel";
     private static final String EXTRA_STARTED_FROM_NOTIFICATION = "com.hextech.smarttime.util"
-            +".started_from_notification";
+            + ".started_from_notification";
 
     private final IBinder iBinder = new LocalBinder();
     private static final long UPDATE_INTERVAL_IN_MIL = 10000;
-    private static final long FASTEST_UPDATE_INTERVAL_IN_MIL = UPDATE_INTERVAL_IN_MIL/2;
+    private static final long FASTEST_UPDATE_INTERVAL_IN_MIL = UPDATE_INTERVAL_IN_MIL / 2;
     private static final int NOTI_ID = 1223;
     private boolean mChangingConfiguration = false;
     private NotificationManager mNotificationManager;
@@ -64,7 +61,7 @@ public class MyBackgroundService extends Service {
     @Override
     public void onCreate() {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        locationCallback = new LocationCallback(){
+        locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 super.onLocationResult(locationResult);
@@ -77,9 +74,9 @@ public class MyBackgroundService extends Service {
         HandlerThread handlerThread = new HandlerThread("SmartTime");
         handlerThread.start();
         mServiceHandler = new Handler(handlerThread.getLooper());
-        mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID,
                     getString(R.string.app_name),
                     NotificationManager.IMPORTANCE_DEFAULT);
@@ -92,7 +89,7 @@ public class MyBackgroundService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         boolean startedFromNotification = intent.getBooleanExtra(EXTRA_STARTED_FROM_NOTIFICATION, false);
-        if(startedFromNotification){
+        if (startedFromNotification) {
             removeLocationUpdates();
             stopSelf();
         }
@@ -110,18 +107,18 @@ public class MyBackgroundService extends Service {
         try {
             fusedLocationProviderClient.removeLocationUpdates(locationCallback);
             stopSelf();
-        } catch (SecurityException ex){
-            Log.e("SmartTime", "Lost location permission. Could not remove updates. "+ex);
+        } catch (SecurityException ex) {
+            Log.e("SmartTime", "Lost location permission. Could not remove updates. " + ex);
         }
     }
 
     private void getLastLocation() {
-        try{
+        try {
             fusedLocationProviderClient.getLastLocation()
                     .addOnCompleteListener(new OnCompleteListener<Location>() {
                         @Override
                         public void onComplete(@NonNull Task<Location> task) {
-                            if(task.isSuccessful() && task.getResult() != null)
+                            if (task.isSuccessful() && task.getResult() != null)
                                 mLocation = task.getResult();
                             else
                                 Log.e("SmartTime", "Failed to get location");
@@ -129,7 +126,7 @@ public class MyBackgroundService extends Service {
                         }
                     });
         } catch (SecurityException ex) {
-            Log.e("SmartTime", "Lost location permission. "+ex);
+            Log.e("SmartTime", "Lost location permission. " + ex);
         }
     }
 
@@ -138,20 +135,20 @@ public class MyBackgroundService extends Service {
         locationRequest.setInterval(UPDATE_INTERVAL_IN_MIL);
         locationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MIL);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        
+
     }
 
     private void onNewLocation(Location lastLocation) {
         mLocation = lastLocation;
         EventBus.getDefault().postSticky(new SendLocationToActivity(mLocation));
 
-        if(serviceIsRunningInForeground(this))
+        if (serviceIsRunningInForeground(this))
             getNotification();
     }
 
     private Notification getNotification() {
         Intent intent = new Intent(this, MyBackgroundService.class);
-        String text = Common.getLocationText(mLocation);
+        final String text = Common.getLocationText(mLocation);
 
         if (mLocation.getLongitude() != currentLatitude && mLocation.getLongitude() != currentLongitude) {
             currentLatitude = mLocation.getLatitude();
@@ -159,18 +156,36 @@ public class MyBackgroundService extends Service {
 
             Log.i("SmartTime", text);
 
-            LocationServiceHandler.sendRequest(getApplicationContext(), currentLatitude, currentLongitude, "restaurant", new VolleyCallback() {
-                @Override
-                public void onSuccess() {
-                    ArrayList<Location> nearbyLocations = LocationServiceHandler.nearbyLocations;
-                    Log.i("SmartTime", "Locations Acquired.");
-                    //TODO Continue Notification work here
-                }
-            });
+            //Returns all the To-Do items in the database
+            ArrayList data = DBHelper.getAllData(getApplicationContext());
+            //List of locations that corresponds to every category in the To-Do list
+            final ArrayList<ArrayList<Location>> locations= new ArrayList<>();
+
+
+
+            for(int i = 0; i < data.size() ; i++){
+
+                ToDoItem td = (ToDoItem) data.get(i);
+                final String category = td.getCategory();
+                final LocationServiceHandler serviceHandler = new LocationServiceHandler();
+                serviceHandler.sendRequest(getApplicationContext(), currentLatitude, currentLongitude, category, new VolleyCallback() {
+                    @Override
+                    public void onSuccess() {
+                        ArrayList<Location> nearbyLocations = serviceHandler.getNearbyLocations();
+                        locations.add(nearbyLocations);
+                        Log.i("SmartTime", "Locations Acquired.");
+                        System.out.println("Sending Notifications " + category);
+                        System.out.println("Final Locations "+locations);
+                        //TODO Continue Notification work here
+                    }
+                });
+            }
+
+
         }
 
         intent.putExtra(EXTRA_STARTED_FROM_NOTIFICATION, true);
-        PendingIntent servicePendingIntent = PendingIntent.getService(this,0, intent,
+        PendingIntent servicePendingIntent = PendingIntent.getService(this, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
         PendingIntent activityPendingIntent = PendingIntent.getActivity(this, 0,
                 new Intent(this, MainActivity.class), 0);
@@ -185,7 +200,7 @@ public class MyBackgroundService extends Service {
                 .setTicker(text)
                 .setWhen(System.currentTimeMillis());
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             builder.setChannelId(CHANNEL_ID);
         }
 
@@ -194,9 +209,9 @@ public class MyBackgroundService extends Service {
 
     private boolean serviceIsRunningInForeground(Context context) {
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        for(ActivityManager.RunningServiceInfo service:manager.getRunningServices(Integer.MAX_VALUE))
-            if(getClass().getName().equals(service.service.getClassName()))
-                if(service.foreground)
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE))
+            if (getClass().getName().equals(service.service.getClassName()))
+                if (service.foreground)
                     return true;
         return false;
     }
@@ -206,13 +221,13 @@ public class MyBackgroundService extends Service {
         startService(new Intent(getApplicationContext(), MyBackgroundService.class));
         try {
             fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
-        }catch (SecurityException ex){
-            Log.e("SmartTime", "Lost location permission. Could not request it "+ ex);
+        } catch (SecurityException ex) {
+            Log.e("SmartTime", "Lost location permission. Could not request it " + ex);
         }
     }
 
     public class LocalBinder extends Binder {
-        public MyBackgroundService getService(){
+        public MyBackgroundService getService() {
             return MyBackgroundService.this;
         }
     }
@@ -235,7 +250,7 @@ public class MyBackgroundService extends Service {
 
     @Override
     public boolean onUnbind(Intent intent) {
-        if(!mChangingConfiguration)
+        if (!mChangingConfiguration)
             startForeground(NOTI_ID, getNotification());
         return true;
     }
