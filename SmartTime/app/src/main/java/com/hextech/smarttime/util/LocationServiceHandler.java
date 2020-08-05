@@ -19,15 +19,15 @@ import java.util.ArrayList;
 
 public class LocationServiceHandler {
 
-    public JSONArray locations;
-    public ArrayList<Location> nearbyLocations;
+    public static JSONArray locations;
+    public static ArrayList<Location> nearbyLocations;
 
-    public void sendRequest(final Context context, final double currentLatitude, final double currentLongitude, final String placeType, final VolleyCallback volleyCallback) {
+    public static void sendRequest(final Context context, final double currentLatitude, final double currentLongitude, final String placeType, final VolleyCallback volleyCallback) {
 
         final Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=AIzaSyDpFXzTaxUzi0r6RJj1UzUflij-JIiQ0oY&location=" + currentLatitude + "," + currentLongitude + "&radius=5000&type=" + placeType;
+                String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=AIzaSyDpFXzTaxUzi0r6RJj1UzUflij-JIiQ0oY&location=" + currentLatitude + "," + currentLongitude + "&radius=1000&type=" + placeType;
                 Log.i("SmartTime", url);
                 RequestQueue queue = Volley.newRequestQueue(context);
 
@@ -60,7 +60,7 @@ public class LocationServiceHandler {
         thread.start();
     }
 
-    private void populateLocationsArray() {
+    private static void populateLocationsArray() {
         nearbyLocations = new ArrayList<>();
 
         for (int i = 0; i < locations.length(); i++) {
@@ -80,7 +80,7 @@ public class LocationServiceHandler {
         }
     }
 
-    public ArrayList<Location> getNearbyLocations() {
+    public static ArrayList<Location> getNearbyLocations() {
         return nearbyLocations;
     }
 }

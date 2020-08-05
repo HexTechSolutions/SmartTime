@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        createNotificationChannel();
+//        createNotificationChannel();
 
         viewListButton = findViewById(R.id.viewEvents);
         addToDoItemButton = findViewById(R.id.addEvent);
@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         viewListButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showNotification();
+//                showNotification();
                 openViewTodoList();
 
             }
@@ -158,33 +158,32 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void createNotificationChannel() {
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = getString(R.string.channel_name);
-            String description = getString(R.string.channel_description);
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
-    }
-
-
-    NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_background)
-            .setContentTitle("Sexxx")
-            .setContentText("Sexxxx")
-            .setStyle(new NotificationCompat.BigTextStyle()
-                    .bigText("More Sexxxx"))
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-    ;
-
-    public void showNotification() {
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        notificationManager.notify(000001, builder.build());
-    }
+//    private void createNotificationChannel() {
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            CharSequence name = getString(R.string.channel_name);
+//            String description = getString(R.string.channel_description);
+//            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+//            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance);
+//            channel.setDescription(description);
+//            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+//            notificationManager.createNotificationChannel(channel);
+//        }
+//    }
+//
+//
+//    NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+//            .setSmallIcon(R.drawable.ic_launcher_background)
+//            .setContentTitle("Sexxx")
+//            .setContentText("Sexxxx")
+//            .setStyle(new NotificationCompat.BigTextStyle()
+//                    .bigText("More Sexxxx"))
+//            .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+//
+//    public void showNotification() {
+//        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+//        notificationManager.notify(000001, builder.build());
+//    }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onListnerLocation(SendLocationToActivity event){

@@ -7,6 +7,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -22,6 +23,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -30,6 +32,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.hextech.smarttime.DetailActivity;
 import com.hextech.smarttime.MainActivity;
 import com.hextech.smarttime.R;
 
@@ -57,6 +60,11 @@ public class MyBackgroundService extends Service {
     private Location mLocation;
 
     private double currentLongitude, currentLatitude;
+    //List of locations that corresponds to every category in the To-Do list
+    ArrayList<ArrayList<Location>> locations= new ArrayList<>();
+
+    public static final String NOTIFICATION_CHANNEL_ID = "10001";
+    private final static String default_notification_channel_id = "default";
 
     @Override
     public void onCreate() {
@@ -70,6 +78,7 @@ public class MyBackgroundService extends Service {
         };
         createLocationRequest();
         getLastLocation();
+        createNotificationChannel();
 
         HandlerThread handlerThread = new HandlerThread("SmartTime");
         handlerThread.start();
@@ -158,28 +167,10 @@ public class MyBackgroundService extends Service {
 
             //Returns all the To-Do items in the database
             ArrayList data = DBHelper.getAllData(getApplicationContext());
-            //List of locations that corresponds to every category in the To-Do list
-            final ArrayList<ArrayList<Location>> locations= new ArrayList<>();
 
-
-
-            for(int i = 0; i < data.size() ; i++){
-
-                ToDoItem td = (ToDoItem) data.get(i);
-                final String category = td.getCategory();
-                final LocationServiceHandler serviceHandler = new LocationServiceHandler();
-                serviceHandler.sendRequest(getApplicationContext(), currentLatitude, currentLongitude, category, new VolleyCallback() {
-                    @Override
-                    public void onSuccess() {
-                        ArrayList<Location> nearbyLocations = serviceHandler.getNearbyLocations();
-                        locations.add(nearbyLocations);
-                        Log.i("SmartTime", "Locations Acquired.");
-                        System.out.println("Sending Notifications " + category);
-                        System.out.println("Final Locations "+locations);
-                        //TODO Continue Notification work here
-                    }
-                });
-            }
+            sendRequest("restaurant");
+            sendRequest("library");
+            sendRequest("park");
 
 
         }
@@ -206,6 +197,63 @@ public class MyBackgroundService extends Service {
 
         return builder.build();
     }
+
+    private void sendRequest(final String location){
+        LocationServiceHandler.sendRequest(getApplicationContext(), currentLatitude, currentLongitude, location, new VolleyCallback() {
+            @Override
+            public void onSuccess() {
+                ArrayList<Location> nearbyLocations = LocationServiceHandler.nearbyLocations;
+                locations.add(nearbyLocations);
+                Log.i("SmartTime", "Locations Acquired.");
+                //System.out.println("Sending Notifications " + category);
+                System.out.println("Final Locations "+locations);
+
+                CreatePushNotification(location,locations.get(0).get(0).getLongitude(),locations.get(0).get(0).getLatitude());
+
+            }
+        });
+    }
+
+    private void CreatePushNotification(String title, double longitude, double latitude){
+
+        System.out.println("Lon" + longitude);
+        System.out.println("Lat" + latitude);
+        //Setting DetailActivity As the Pending Intent
+        Intent detailActivity = new Intent(this, DetailActivity.class);
+        detailActivity.putExtra("longitude",longitude);
+        detailActivity.putExtra("latitude", latitude);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addNextIntentWithParentStack(detailActivity);
+
+        PendingIntent DetailPendingIntent = stackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
+
+        //Creating Notification
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setContentTitle(title + " Found")
+                .setContentText("Test Notification")
+                .setStyle(new NotificationCompat.BigTextStyle()
+                        .bigText("Click to see Details"))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(DetailPendingIntent);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
+        notificationManager.notify(000001, builder.build());
+    }
+
+    private void createNotificationChannel() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.channel_name);
+            String description = getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
 
     private boolean serviceIsRunningInForeground(Context context) {
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
