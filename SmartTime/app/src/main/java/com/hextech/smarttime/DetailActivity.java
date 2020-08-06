@@ -3,6 +3,7 @@ package com.hextech.smarttime;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -17,8 +18,9 @@ import java.util.ArrayList;
 public class DetailActivity extends AppCompatActivity {
 
     TextView taskTitleTF, taskDescriptionTF, taskCategoryTF, taskDateTF;
-    Button deleteTaskBtn;
+    Button deleteTaskBtn, getDirectionsBtn;
     ToDoItem item;
+    double notificationLatitude, notificationLongitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,14 +36,28 @@ public class DetailActivity extends AppCompatActivity {
         taskDateTF = findViewById(R.id.taskDateTF);
 
         deleteTaskBtn = findViewById(R.id.DeleteTaskBtn);
+        getDirectionsBtn = findViewById(R.id.getDirectionsBtn);
 
         final int recordId = getIntent().getIntExtra("itemNumber", -1);
         String notificationCategory = getIntent().getStringExtra("category");
-        double notificationLongitude = getIntent().getDoubleExtra("longitude", -1);
-        double notificationLatitude = getIntent().getDoubleExtra("latitude", -1);
 
         if (notificationCategory != null && !notificationCategory.equals("")) {
             populateFromNotification(notificationCategory);
+
+            notificationLongitude = getIntent().getDoubleExtra("longitude", -1);
+            notificationLatitude = getIntent().getDoubleExtra("latitude", -1);
+
+            if(notificationLatitude == -1.0 && notificationLongitude == -1.0){
+                getDirectionsBtn.setVisibility(View.INVISIBLE);
+            }else{
+                getDirectionsBtn.setVisibility(View.VISIBLE);
+                getDirectionsBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        openDirectionsOnGoogleMaps(notificationLatitude, notificationLongitude);
+                    }
+                });
+            }
         }
 
         if (recordId != -1) {
@@ -55,6 +71,13 @@ public class DetailActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    private void openDirectionsOnGoogleMaps(double latitude, double longitude) {
+        Uri gmmIntentUri = Uri.parse("google.navigation:q=" + latitude + "," + longitude);
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+        startActivity(mapIntent);
     }
 
     private void populateFields(int recordId) {
