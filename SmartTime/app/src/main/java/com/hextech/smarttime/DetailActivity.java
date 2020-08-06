@@ -3,6 +3,7 @@ package com.hextech.smarttime;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -17,8 +18,9 @@ import java.util.ArrayList;
 public class DetailActivity extends AppCompatActivity {
 
     TextView taskTitleTF, taskDescriptionTF, taskCategoryTF, taskDateTF;
-    Button deleteTaskBtn;
+    Button deleteTaskBtn, getDirectionsBtn;
     ToDoItem item;
+    double notificationLatitude, notificationLongitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +36,30 @@ public class DetailActivity extends AppCompatActivity {
         taskDateTF = findViewById(R.id.taskDateTF);
 
         deleteTaskBtn = findViewById(R.id.DeleteTaskBtn);
+        getDirectionsBtn = findViewById(R.id.getDirectionsBtn);
 
         final int recordId = getIntent().getIntExtra("itemNumber", -1);
+        String notificationCategory = getIntent().getStringExtra("category");
+
+        if (notificationCategory != null && !notificationCategory.equals("")) {
+            populateFromNotification(notificationCategory);
+
+            notificationLongitude = getIntent().getDoubleExtra("longitude", -1);
+            notificationLatitude = getIntent().getDoubleExtra("latitude", -1);
+
+            if(notificationLatitude == -1.0 && notificationLongitude == -1.0){
+                getDirectionsBtn.setVisibility(View.INVISIBLE);
+            }else{
+                getDirectionsBtn.setVisibility(View.VISIBLE);
+                getDirectionsBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        openDirectionsOnGoogleMaps(notificationLatitude, notificationLongitude);
+                    }
+                });
+            }
+        }
+
         if (recordId != -1) {
             populateFields(recordId);
         }
@@ -49,6 +73,13 @@ public class DetailActivity extends AppCompatActivity {
         });
     }
 
+    private void openDirectionsOnGoogleMaps(double latitude, double longitude) {
+        Uri gmmIntentUri = Uri.parse("google.navigation:q=" + latitude + "," + longitude);
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+        startActivity(mapIntent);
+    }
+
     private void populateFields(int recordId) {
         ArrayList<ToDoItem> list = new DBHelper(getApplicationContext()).getAllData(getApplicationContext());
         item = list.get(recordId);
@@ -57,6 +88,16 @@ public class DetailActivity extends AppCompatActivity {
             taskDescriptionTF.setText(item.getDescription());
             taskCategoryTF.setText(item.getCategory());
             taskDateTF.setText(Utilities.convertDateToString(item.getDueDate()));
+        }
+    }
+
+    private void populateFromNotification(String category) {
+        ArrayList<ToDoItem> toDoItems = DBHelper.getAllDataFromCategory(getApplicationContext(), category);
+        if (toDoItems != null && toDoItems.size() > 0) {
+            taskTitleTF.setText(toDoItems.get(0).getTitle());
+            taskDescriptionTF.setText(toDoItems.get(0).getDescription());
+            taskCategoryTF.setText(toDoItems.get(0).getCategory());
+            taskDateTF.setText(Utilities.convertDateToString(toDoItems.get(0).getDueDate()));
         }
     }
 
