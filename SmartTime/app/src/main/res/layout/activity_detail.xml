@@ -111,8 +111,14 @@
 
                     <Button
                         android:id="@+id/DeleteTaskBtn"
-                        android:layout_marginLeft="200px"
-                        android:text="Delete Task" />
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Delete Task"
+                        android:layout_marginLeft="50dp"
+                        android:layout_marginRight="50dp"
+                        android:textColor="@color/cardview_light_background"
+                        android:background="@drawable/settings_btn"/>
 
                 </TableRow>
 
@@ -123,8 +129,14 @@
 
                     <Button
                         android:id="@+id/navigateButton"
-                        android:layout_width="match_parent"
-                        android:text="Navigate" />
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Navigate"
+                        android:layout_marginLeft="50dp"
+                        android:layout_marginRight="50dp"
+                        android:textColor="@color/cardview_light_background"
+                        android:background="@drawable/settings_btn"/>
                 </TableRow>
 
             </TableLayout>
