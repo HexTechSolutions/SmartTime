@@ -58,6 +58,14 @@ public class CreateToDoItem extends AppCompatActivity {
 
         spinner1 = (Spinner) findViewById(R.id.spinner);
         btnSave = (Button) findViewById(R.id.btnSave);
+        btnCancel = (Button) findViewById(R.id.btnCancel);
+
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
         btnSave.setOnClickListener(new View.OnClickListener() {
 
@@ -85,6 +93,7 @@ public class CreateToDoItem extends AppCompatActivity {
 
                 if (status) {
                     Toast.makeText(CreateToDoItem.this, "Data Insertion Successful!", Toast.LENGTH_SHORT).show();
+                    finish();
                 } else {
                     Toast.makeText(CreateToDoItem.this, "Data Insertion Failed!", Toast.LENGTH_SHORT).show();
                 }

@@ -30,7 +30,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
     }
 
-    public ArrayList<ToDoItem> getAllData(Context context) {
+    public static ArrayList<ToDoItem> getAllData(Context context) {
         DBHelper dbHelper = new DBHelper(context);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String[] projection = {DatabaseTableColumns.RECORD_ID.toString(), DatabaseTableColumns.TITLE.toString(), DatabaseTableColumns.DESCRIPTION.toString(), DatabaseTableColumns.CATEGORY.toString(), DatabaseTableColumns.CREATION_DATE.toString(), DatabaseTableColumns.DUE_DATE.toString()};
@@ -41,6 +41,34 @@ public class DBHelper extends SQLiteOpenHelper {
             String title = cursor.getString(cursor.getColumnIndex(DatabaseTableColumns.TITLE.toString()));
             String description = cursor.getString(cursor.getColumnIndex(DatabaseTableColumns.DESCRIPTION.toString()));
             String category = cursor.getString(cursor.getColumnIndex(DatabaseTableColumns.CATEGORY.toString()));
+
+            String creationDateString = cursor.getString(cursor.getColumnIndex(DatabaseTableColumns.CREATION_DATE.toString()));
+            String dueDateString = cursor.getString(cursor.getColumnIndex(DatabaseTableColumns.DUE_DATE.toString()));
+
+            Date creationDate = Utilities.convertStringToDate(creationDateString);
+            Date dueDate = Utilities.convertStringToDate(dueDateString);
+
+            ToDoItem toDoItem = new ToDoItem(title, description, category, creationDate, dueDate);
+            toDoItem.setRecordID(recordId);
+            todoList.add(toDoItem);
+        }
+        cursor.close();
+        return todoList;
+    }
+
+    public static ArrayList<ToDoItem> getAllDataFromCategory(Context context, String category) {
+        category = category.substring(0, 1).toUpperCase() + category.substring(1);
+        DBHelper dbHelper = new DBHelper(context);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String selection = DatabaseTableColumns.CATEGORY.toString() + " = '" + category + "'";
+        String sortOrder = DatabaseTableColumns.DUE_DATE.toString();
+        String[] projection = {DatabaseTableColumns.RECORD_ID.toString(), DatabaseTableColumns.TITLE.toString(), DatabaseTableColumns.DESCRIPTION.toString(), DatabaseTableColumns.CATEGORY.toString(), DatabaseTableColumns.CREATION_DATE.toString(), DatabaseTableColumns.DUE_DATE.toString()};
+        Cursor cursor = db.query(TABLE_NAME, projection, selection, null, null, null, sortOrder);
+        ArrayList<ToDoItem> todoList = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            int recordId = cursor.getInt(cursor.getColumnIndex(DatabaseTableColumns.RECORD_ID.toString()));
+            String title = cursor.getString(cursor.getColumnIndex(DatabaseTableColumns.TITLE.toString()));
+            String description = cursor.getString(cursor.getColumnIndex(DatabaseTableColumns.DESCRIPTION.toString()));
 
             String creationDateString = cursor.getString(cursor.getColumnIndex(DatabaseTableColumns.CREATION_DATE.toString()));
             String dueDateString = cursor.getString(cursor.getColumnIndex(DatabaseTableColumns.DUE_DATE.toString()));
