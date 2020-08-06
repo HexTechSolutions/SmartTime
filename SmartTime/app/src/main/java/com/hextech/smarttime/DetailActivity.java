@@ -58,6 +58,8 @@ public class DetailActivity extends AppCompatActivity {
                     }
                 });
             }
+        } else {
+            getDirectionsBtn.setVisibility(View.INVISIBLE);
         }
 
         if (recordId != -1) {
