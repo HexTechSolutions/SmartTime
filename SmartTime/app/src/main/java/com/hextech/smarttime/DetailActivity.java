@@ -38,6 +38,14 @@ public class DetailActivity extends AppCompatActivity {
         getDirectionsBtn = findViewById(R.id.getDirectionsBtn);
 
         final int recordId = getIntent().getIntExtra("itemNumber", -1);
+        String notificationCategory = getIntent().getStringExtra("category");
+        double notificationLongitude = getIntent().getDoubleExtra("longitude", -1);
+        double notificationLatitude = getIntent().getDoubleExtra("latitude", -1);
+
+        if (notificationCategory != null && !notificationCategory.equals("")) {
+            populateFromNotification(notificationCategory);
+        }
+
         if (recordId != -1) {
             populateFields(recordId);
         }
@@ -81,6 +89,16 @@ public class DetailActivity extends AppCompatActivity {
             taskDescriptionTF.setText(item.getDescription());
             taskCategoryTF.setText(item.getCategory());
             taskDateTF.setText(Utilities.convertDateToString(item.getDueDate()));
+        }
+    }
+
+    private void populateFromNotification(String category) {
+        ArrayList<ToDoItem> toDoItems = DBHelper.getAllDataFromCategory(getApplicationContext(), category);
+        if (toDoItems != null && toDoItems.size() > 0) {
+            taskTitleTF.setText(toDoItems.get(0).getTitle());
+            taskDescriptionTF.setText(toDoItems.get(0).getDescription());
+            taskCategoryTF.setText(toDoItems.get(0).getCategory());
+            taskDateTF.setText(Utilities.convertDateToString(toDoItems.get(0).getDueDate()));
         }
     }
 

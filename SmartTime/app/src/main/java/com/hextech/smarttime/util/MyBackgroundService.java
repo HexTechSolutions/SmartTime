@@ -7,6 +7,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -30,6 +31,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.hextech.smarttime.DetailActivity;
 import com.hextech.smarttime.MainActivity;
 import com.hextech.smarttime.R;
 
@@ -60,6 +62,8 @@ public class MyBackgroundService extends Service {
     private Location mLocation;
 
     private double currentLongitude, currentLatitude;
+
+    private ArrayList<String> notificationsSentList;
 
     @Override
     public void onCreate() {
@@ -149,6 +153,26 @@ public class MyBackgroundService extends Service {
             getNotification();
     }
 
+    private String getChannelId(String category) {
+        return category + "_id";
+    }
+
+    private int getNotificationId(String category) {
+        switch (category.toLowerCase()) {
+            case "restaurant":
+                return 1111;
+            case "park":
+                return 2222;
+            case "coffee":
+                return 3333;
+            case "library":
+                return 4444;
+            case "shopping":
+                return 5555;
+        }
+        return -1;
+    }
+
     private Notification getNotification() {
         Intent intent = new Intent(this, MyBackgroundService.class);
         String text = Common.getLocationText(mLocation);
@@ -156,17 +180,16 @@ public class MyBackgroundService extends Service {
         if (mLocation.getLongitude() != currentLatitude && mLocation.getLongitude() != currentLongitude) {
             currentLatitude = mLocation.getLatitude();
             currentLongitude = mLocation.getLongitude();
+            notificationsSentList = new ArrayList<>();
 
             Log.i("SmartTime", text);
 
-            LocationServiceHandler.sendRequest(getApplicationContext(), currentLatitude, currentLongitude, "restaurant", new VolleyCallback() {
-                @Override
-                public void onSuccess() {
-                    ArrayList<Location> nearbyLocations = LocationServiceHandler.nearbyLocations;
-                    Log.i("SmartTime", "Locations Acquired.");
-                    //TODO Continue Notification work here
-                }
-            });
+            //TODO
+            ArrayList<ToDoItem> toDoItems = DBHelper.getAllData(getApplicationContext());
+            for (ToDoItem item: toDoItems) {
+                sendRequest(currentLatitude, currentLongitude, item.getCategory().toLowerCase(), getChannelId(item.getCategory()), getNotificationId(item.getCategory()));
+            }
+
         }
 
         intent.putExtra(EXTRA_STARTED_FROM_NOTIFICATION, true);
@@ -190,6 +213,71 @@ public class MyBackgroundService extends Service {
         }
 
         return builder.build();
+    }
+
+    private void sendRequest(double currentLatitude, double currentLongitude, final String placeType, final String CHANNEL_ID, final int notificationID) {
+
+        if (notificationsSentList == null) {
+            notificationsSentList = new ArrayList<>();
+        }
+
+        if (notificationsSentList.contains(placeType)) {
+            return;
+        }
+        notificationsSentList.add(placeType);
+
+        LocationServiceHandler.sendRequest(getApplicationContext(), currentLatitude, currentLongitude, placeType, new VolleyCallback() {
+            @Override
+            public void onSuccess() {
+                ArrayList<Location> nearbyLocations = LocationServiceHandler.nearbyLocations;
+                Log.i("SmartTime", "Locations Acquired.");
+                if (nearbyLocations.size() > 0) {
+                    createNotification(placeType, CHANNEL_ID, notificationID, nearbyLocations.get(0).getLongitude(), nearbyLocations.get(0).getLatitude());
+                }
+            }
+        });
+    }
+
+    private void createNotification(String category, String CHANNEL_ID, int notificationId, double longitude, double latitude) {
+
+        Intent intent = new Intent(getApplicationContext(), DetailActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.putExtra("category", category);
+        intent.putExtra("longitude", longitude);
+        intent.putExtra("latitude", latitude);
+
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(getApplicationContext());
+        stackBuilder.addParentStack(DetailActivity.class);
+        stackBuilder.addNextIntent(intent);
+
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(notificationId,PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(category)
+                .setContentText("Content")
+                .setStyle(new NotificationCompat.BigTextStyle()
+                        .bigText(category + "Found. Click to view details."))
+                .setContentIntent(resultPendingIntent)
+                .setGroup("NOTIF_GROUP")
+                .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_MAX);
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            NotificationChannel channel = new NotificationChannel(
+                    CHANNEL_ID,
+                    "SmartTime",
+                    NotificationManager.IMPORTANCE_HIGH);
+            notificationManager.createNotificationChannel(channel);
+            builder.setChannelId(CHANNEL_ID);
+        }
+
+        notificationManager.notify(notificationId, builder.build());
     }
 
     private boolean serviceIsRunningInForeground(Context context) {
