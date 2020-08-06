@@ -11,11 +11,16 @@
         android:id="@+id/addEvent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/add_new_event" />
+        android:text="@string/add_new_event"
+        android:textColor="@color/cardview_light_background"
+        android:background="@drawable/settings_btn"/>
 
     <Button
         android:id="@+id/viewEvents"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/view_events" />
+        android:text="@string/view_events"
+        android:textColor="@color/cardview_light_background"
+        android:background="@drawable/settings_btn"
+        android:layout_marginTop="5dp"/>
 </LinearLayout>
