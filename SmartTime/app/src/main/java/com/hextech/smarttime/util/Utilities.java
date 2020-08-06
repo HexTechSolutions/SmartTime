@@ -9,7 +9,7 @@ import java.util.Locale;
 public class Utilities {
 
     public static Date convertStringToDate(String dateString) {
-        DateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.ENGLISH);
+        DateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
 
         Date date = null;
 
@@ -23,7 +23,7 @@ public class Utilities {
     }
 
     public static String convertDateToString(Date date) {
-        DateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.ENGLISH);
+        DateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
         return format.format(date);
     }
 

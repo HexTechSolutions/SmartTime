@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.hextech.smarttime.util.DBHelper;
+import com.hextech.smarttime.util.Utilities;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -38,6 +39,8 @@ public class ToDoListViewAdapter extends RecyclerView.Adapter<ToDoListViewAdapte
 
         holder.title.setText(dataBase.getAllData(context).get(position).getTitle());
         holder.description.setText(dataBase.getAllData(context).get(position).getDescription());
+        String date1 = Utilities.convertDateToString(dataBase.getAllData(context).get(position).getCreatedDate());
+        holder.date.setText("Due Date : " + date1);
 
     }
 
@@ -49,13 +52,14 @@ public class ToDoListViewAdapter extends RecyclerView.Adapter<ToDoListViewAdapte
 
     public class ToDoListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        TextView title, description;
+        TextView title, description, date;
         OnTodoListner onTodoListner;
 
         public ToDoListViewHolder(@NonNull View itemView, OnTodoListner onTodoListner) {
             super(itemView);
             title = itemView.findViewById(R.id.todo_title_text);
             description = itemView.findViewById(R.id.todo_desc_text);
+            date = itemView.findViewById(R.id.todo_date_text);
             this.onTodoListner = onTodoListner;
 
             itemView.setOnClickListener(this);
