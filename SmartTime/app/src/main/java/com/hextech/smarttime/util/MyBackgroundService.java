@@ -259,7 +259,7 @@ public class MyBackgroundService extends Service {
                 .setContentTitle(category)
                 .setContentText("Content")
                 .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText(category + "Found. Click to view details."))
+                        .bigText(category + " Found. Click to view details."))
                 .setContentIntent(resultPendingIntent)
                 .setGroup("NOTIF_GROUP")
                 .setAutoCancel(true)
