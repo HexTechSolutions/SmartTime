@@ -30,7 +30,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
     }
 
-    public ArrayList<ToDoItem> getAllData(Context context) {
+    public static ArrayList<ToDoItem> getAllData(Context context) {
         DBHelper dbHelper = new DBHelper(context);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String[] projection = {DatabaseTableColumns.RECORD_ID.toString(), DatabaseTableColumns.TITLE.toString(), DatabaseTableColumns.DESCRIPTION.toString(), DatabaseTableColumns.CATEGORY.toString(), DatabaseTableColumns.CREATION_DATE.toString(), DatabaseTableColumns.DUE_DATE.toString()};

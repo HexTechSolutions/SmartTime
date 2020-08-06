@@ -2,7 +2,7 @@ package com.hextech.smarttime.util;
 
 import java.util.Date;
 
-public class ToDoItem {
+public class ToDoItem implements Comparable<ToDoItem> {
 
     int recordID = 0;
     String title, description, category;
@@ -74,5 +74,10 @@ public class ToDoItem {
                 ", createdDate=" + createdDate +
                 ", dueDate=" + dueDate +
                 '}';
+    }
+
+    @Override
+    public int compareTo(ToDoItem toDoItem) {
+        return this.dueDate.compareTo(toDoItem.dueDate);
     }
 }
